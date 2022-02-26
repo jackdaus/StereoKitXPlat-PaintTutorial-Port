@@ -18,12 +18,14 @@ namespace StereoKitApp
 		Material  floorMaterial;
 
 		// UI param initialization
-		// Sprite powerSprite = Sprite.FromFile("power.png", SpriteType.Single);
 		Pose windowPose = new Pose(-.2f, .1f, -0.2f, Quat.LookDir(1, 0, 1));
 		bool showHeader = true;
 		bool moveCube = true;
 		float slider = 0.001f;
 
+		// Loading sprite doesn't seem to work
+		// Sprite powerSprite = Sprite.FromFile("power.png", SpriteType.Single);
+		
 		public void Init()
 		{
 			// Create assets used by the app
