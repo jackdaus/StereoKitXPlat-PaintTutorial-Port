@@ -19,4 +19,10 @@
     <PackageReference Include="StereoKit" Version="0.3.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Assets\power.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

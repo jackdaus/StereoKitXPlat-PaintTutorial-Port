@@ -23,8 +23,7 @@ namespace StereoKitApp
 		bool moveCube = true;
 		float slider = 0.001f;
 
-		// Loading sprite doesn't seem to work
-		// Sprite powerSprite = Sprite.FromFile("power.png", SpriteType.Single);
+		Sprite powerSprite;
 		
 		public void Init()
 		{
@@ -35,6 +34,8 @@ namespace StereoKitApp
 
 			floorMaterial = new Material(Shader.FromFile("floor.hlsl"));
 			floorMaterial.Transparency = Transparency.Blend;
+
+			powerSprite = Sprite.FromFile("power.png", SpriteType.Single);
 		}
 
 		public void Step()
@@ -65,10 +66,10 @@ namespace StereoKitApp
 			// Cube roaming button
 			UI.Toggle("Cube roaming", ref moveCube);
 
-			//if (UI.ButtonRound("Exit", null))
-			//    SK.Quit();
+            if (UI.ButtonRound("Exit", powerSprite))
+                SK.Quit();
 
-			UI.WindowEnd();
+            UI.WindowEnd();
         }
     }
 }
