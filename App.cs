@@ -6,70 +6,95 @@ namespace StereoKitApp
 	public class App
 	{
 		public SKSettings Settings => new SKSettings { 
-			appName           = "StereoKit Template",
+			appName           = "StereoKit Ink",
 			assetsFolder      = "Assets",
 			displayPreference = DisplayMode.MixedReality
 		};
 
-		static float cubeX = 0.0f;
-		Pose  cubePose = new Pose(cubeX, 0, -0.5f, Quat.Identity);
-		Model cube;
 		Matrix4x4 floorTransform = Matrix.TS(new Vector3(0, -1.5f, 0), new Vector3(30, 0.1f, 30));
 		Material  floorMaterial;
 
-		// UI param initialization
-		Pose windowPose = new Pose(-.2f, .1f, -0.2f, Quat.LookDir(1, 0, 1));
-		bool showHeader = true;
-		bool moveCube = true;
-		float slider = 0.001f;
+		// For SteroKitInk
+		static Painting activePainting = new Painting();
+		static PaletteMenu palleteMenu;
+		static Pose menuPose = new Pose(0.4f, 0, -0.4f, Quat.LookDir(-1, 0, 1));
+		static Sprite appLogo;
 
-		Sprite powerSprite;
-		
 		public void Init()
 		{
-			// Create assets used by the app
-			cube = Model.FromMesh(
-				Mesh.GenerateRoundedCube(Vec3.One * 0.1f, 0.02f),
-				Default.MaterialUI);
-
 			floorMaterial = new Material(Shader.FromFile("floor.hlsl"));
 			floorMaterial.Transparency = Transparency.Blend;
 
-			powerSprite = Sprite.FromFile("power.png", SpriteType.Single);
+			palleteMenu = new PaletteMenu();
+
+			appLogo = Sprite.FromFile("StereoKitInkLight.png");
 		}
 
 		public void Step()
 		{
-			if (SK.System.displayType == Display.Opaque)
-				Default.MeshCube.Draw(floorMaterial, floorTransform);
+            if (SK.System.displayType == Display.Opaque)
+                Default.MeshCube.Draw(floorMaterial, floorTransform);
 
-			// Update the cube location if roaming
-			var newCubePositionX = cubePose.position.x;
-			if (moveCube)
-			{
-				newCubePositionX += slider;
-			}
-			cubePose = new Pose(newCubePositionX, cubePose.position.y, cubePose.position.z, cubePose.orientation);
-
-			UI.Handle("Cube", ref cubePose, cube.Bounds);
-			cube.Draw(cubePose.ToMatrix());
-
-			// UI Window
-            UI.WindowBegin("Window", ref windowPose, new Vec2(20, 0) * U.cm, showHeader ? UIWin.Normal : UIWin.Body);
-            UI.Toggle("Show Header", ref showHeader);
-
-            // Slider example
-            UI.Label("Slide");
-            UI.SameLine();
-            UI.HSlider("slider", ref slider, -0.01f, .01f, .001f, 72 * U.mm);
-
-			// Cube roaming button
-			UI.Toggle("Cube roaming", ref moveCube);
-
-            if (UI.ButtonRound("Exit", powerSprite))
-                SK.Quit();
-
-            UI.WindowEnd();
+            activePainting.Step(Handed.Right, palleteMenu.PaintColor, palleteMenu.PaintSize);
+            palleteMenu.Step();
+            StepMenuWindow();
         }
-    }
+
+		static void StepMenuWindow()
+		{
+			// Begin the application's menu window, we'll draw this without a
+			// head bar (Body only) since we have a nice application image we can
+			// add instead!
+			UI.WindowBegin("Menu", ref menuPose, UIWin.Body);
+
+			// Just draw the application logo across the top of the Menu window!
+			// Vec2.Zero here tells StereoKit to auto-size both axes, so this
+			// will automatically expand to the width of the window.
+			UI.Image(appLogo, V.XY(UI.LayoutRemaining.x, 0));
+
+			// Add undo and redo to the main menu, these are both available on
+			// the radial menu, but these are easier to discover, and it never
+			// hurts to have multiple options!
+			if (UI.Button("Undo")) activePainting?.Undo();
+			UI.SameLine();
+			if (UI.Button("Redo")) activePainting?.Redo();
+
+			// When the user presses the save button, lets show a save file
+			// dialog! When a file name and folder have been selected, it'll make
+			// a call to SavePainting with the file's path name with the .skp
+			// extension.
+			if (UI.Button("Save"))
+				Platform.FilePicker(PickerMode.Save, SavePainting, null, ".skp");
+
+			// And on that same line, we'll have a load button! This'll let the
+			// user pick out any .skp files, and will call LoadPainting with the
+			// selected file.
+			UI.SameLine();
+			if (UI.Button("Load"))
+				Platform.FilePicker(PickerMode.Open, LoadPainting, null, ".skp");
+
+			// Some visual separation
+			UI.HSeparator();
+
+			// Clear is easy! Just create a new Painting object!
+			if (UI.Button("Clear"))
+				activePainting = new Painting();
+
+			// And if they want to quit? Just tell StereoKit! This will let
+			// StereoKit finish the the frame properly, and then break out of the
+			// Step loop above.
+			UI.SameLine();
+			if (UI.Button("Quit"))
+				SK.Quit();
+
+			// And end the window!
+			UI.WindowEnd();
+		}
+
+		static void LoadPainting(string file)
+			=> activePainting = Painting.FromFile(Platform.ReadFileText(file) ?? "");
+
+		static void SavePainting(string file)
+			=> Platform.WriteFile(file, activePainting.ToFileData());
+	}
 }
