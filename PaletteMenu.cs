@@ -53,20 +53,20 @@ class PaletteMenu
         // let the user HSV their color manually. We start with a fixed size
         // label, and on the same line add a fixed size slider. Fixing the
         // sizes here helps them to line up in columns.
-        //UI.Label("Hue", V.XY(8 * U.cm, UI.LineHeight));
-        //UI.SameLine();
-        //if (UI.HSlider("Hue", ref _hue, 0, 1, 0, 22 * U.cm, UIConfirm.Pinch))
-            //SetColor(_hue, _saturation, _value);
+        UI.Label("Hue", V.XY(8 * U.cm, UI.LineHeight));
+        UI.SameLine();
+        if (UI.HSlider("Hue", ref _hue, 0, 1, 0, 22 * U.cm, UIConfirm.Pinch))
+            SetColor(_hue, _saturation, _value);
 
-        //UI.Label("Saturation", V.XY(8*U.cm, UI.LineHeight));
-        //UI.SameLine();
-        //if (UI.HSlider("Saturation", ref _saturation, 0, 1, 0, 22*U.cm, UIConfirm.Pinch))
-        //	SetColor(_hue, _saturation, _value);
+        UI.Label("Saturation", V.XY(8 * U.cm, UI.LineHeight));
+        UI.SameLine();
+        if (UI.HSlider("Saturation", ref _saturation, 0, 1, 0, 22 * U.cm, UIConfirm.Pinch))
+            SetColor(_hue, _saturation, _value);
 
-        //UI.Label("Value", V.XY(8*U.cm, UI.LineHeight));
-        //UI.SameLine();
-        //if (UI.HSlider("Value", ref _value, 0, 1, 0, 22*U.cm, UIConfirm.Pinch))
-        //	SetColor(_hue, _saturation, _value);
+        UI.Label("Value", V.XY(8 * U.cm, UI.LineHeight));
+        UI.SameLine();
+        if (UI.HSlider("Value", ref _value, 0, 1, 0, 22 * U.cm, UIConfirm.Pinch))
+            SetColor(_hue, _saturation, _value);
 
         UI.HSeparator();
 
@@ -86,14 +86,14 @@ class PaletteMenu
 		UI.SameLine();
 		if (SwatchSize("Xtra",  4*U.cm)) _size = 4 * U.cm;
 
-		//UI.Label("Size", V.XY(8 * U.cm, UI.LineHeight));
-		//UI.SameLine();
-		//UI.HSlider("Size", ref _size, 0.001f, 0.05f, 0, 22 * U.cm, UIConfirm.Pinch);
+        UI.Label("Size", V.XY(8 * U.cm, UI.LineHeight));
+        UI.SameLine();
+        UI.HSlider("Size", ref _size, 0.001f, 0.05f, 0, 22 * U.cm, UIConfirm.Pinch);
 
-		// Display a preview of the brush stroke's size. We'll reserve a box
-		// that can hold the maximum size for the brush stroke, and preview
-		// the stroke with an unlit cube scaled to the brush's size.
-		Bounds linePreview = UI.LayoutReserve(V.XY(0, 0.05f));
+        // Display a preview of the brush stroke's size. We'll reserve a box
+        // that can hold the maximum size for the brush stroke, and preview
+        // the stroke with an unlit cube scaled to the brush's size.
+        Bounds linePreview = UI.LayoutReserve(V.XY(0, 0.05f));
 		linePreview.dimensions.y = _size;
 		linePreview.dimensions.z = U.cm;
 		Mesh.Cube.Draw(Material.Unlit, Matrix.TS(linePreview.center, linePreview.dimensions), _color);
