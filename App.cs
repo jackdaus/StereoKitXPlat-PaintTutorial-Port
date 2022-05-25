@@ -1,4 +1,5 @@
 ﻿using StereoKit;
+using StereoKit.Framework;
 using System.Numerics;
 
 namespace StereoKitApp
@@ -28,7 +29,12 @@ namespace StereoKitApp
 			palleteMenu = new PaletteMenu();
 
 			appLogo = Sprite.FromFile("StereoKitInkLight.png");
-		}
+
+            SK.AddStepper(new HandMenuRadial(
+            new HandRadialLayer("Root", -90,
+                new HandMenuItem("Undo", null, () => activePainting?.Undo()),
+                new HandMenuItem("Redo", null, () => activePainting?.Redo()))));
+        }
 
 		public void Step()
 		{
