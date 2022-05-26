@@ -10,6 +10,7 @@ using Android.Graphics;
 using Java.Lang;
 using System.Threading.Tasks;
 using StereoKitApp;
+using StereoKit.Framework;
 
 namespace StereoKit_Android
 {
@@ -64,8 +65,18 @@ namespace StereoKit_Android
 				// Initialize StereoKit, and the app
 				SKSettings settings = app.Settings;
 				settings.androidActivity = activityHandle;
-				if (!SK.Initialize(settings))
-					return;
+
+				// Add passthrough extension for Oculus
+
+				Console.WriteLine($"[Backend.XRType] {Backend.XRType}");
+				// [Backend.XRType] Simulator
+
+				var passthroughStepper = SK.AddStepper(new PassthroughFBExt());
+                passthroughStepper.EnabledPassthrough = true;
+
+
+                if (!SK.Initialize(settings))
+					return;	
 				app.Init();
 
 				// Now loop until finished, and then shut down
